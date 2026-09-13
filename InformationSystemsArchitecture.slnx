@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Console/Console.csproj" Id="1bb54d07-1ef3-424b-b12c-82a1eebf0e9a" />
+  <Project Path="Model/Model.csproj" />
+  <Project Path="WinForms/WinForms.csproj" Id="eba2a22f-a94e-4751-855b-febae5e64ff6" />
+</Solution>

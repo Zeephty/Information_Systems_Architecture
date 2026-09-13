@@ -1,0 +1,24 @@
+# Сборка
+[Bb]in/
+[Oo]bj/
+
+# IDE
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.DotSettings.user
+
+# NuGet
+*.nupkg
+
+# Логи
+*.log
+
+# Данные приложения
+robots.json
+
+# OS
+.DS_Store
+Thumbs.db
