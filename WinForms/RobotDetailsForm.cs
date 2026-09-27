@@ -27,9 +27,9 @@ namespace WinForms
                 $"Цель: {robot.Goal}\n\n" +
                 $"Детали: {robot.Details}\n\n" +
                 $"Внешность: {robot.Appearance}\n\n" +
-                $"Оценка: {robot.Score}/10\n" +
+                $"Оценка: {robot.CriteriaCodes.Count}/{CriteriaLegend.Legend.Count}\n" +
                 $"Критерии:\n{CriteriaLegend.Describe(robot.CriteriaCodes)}\n\n" +
-                $"Цена: {robot.PriceRub:N0} ₽";
+                $"Цена: {robot.PriceRub:N0} руб.";
         }
     }
 }

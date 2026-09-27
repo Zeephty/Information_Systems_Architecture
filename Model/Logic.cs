@@ -10,30 +10,27 @@ namespace Model
     /// </summary>
     public class Logic
     {
-        private readonly string dataFile = Path.Combine("robots.json");
+        private readonly string dataFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+            "..", "..", "..", "..",
+            "Model", "data", "robots.json");
         private readonly List<Robot> robots = new List<Robot>();
 
         /// <summary> Доступ к списку роботов только для чтения. </summary>
         public IReadOnlyList<Robot> Robots => robots;
 
-        /// <summary>
-        /// Добавляет нового робота в коллекцию.
-        /// </summary>
-        /// <param name="robot"> Экземпляр добовляемого робота. </param>
-        /// <exception cref="ArgumentException"> Если ID пуст. </exception>
-        /// <exception cref="InvalidOperationException"> Если робот с таким ID уже существует. </exception>
-        public void Add(Robot robot)
-        {
-            if (string.IsNullOrWhiteSpace(robot.Name))
-            {
-                throw new ArgumentException("ID обязателен");
-            }
-            if (robots.Any(r => r.Id == robot.Id))
-            {
-                throw new InvalidOperationException($"Робот с ID {robot.Id} уже существует");
-            }
+        /// <summary> Следующий свободный ID (максимальный + 1). </summary>
+        public int NextId => robots.Count == 0 ? 1 : robots.Max(r => r.Id) + 1;
 
+        /// <summary>
+        /// Добавляет нового робота. ID присваивается автоматически.
+        /// </summary>
+        /// <param name="robot"> Экземпляр робота (поле Id игнорируется). </param>
+        /// <returns> Присвоенный ID. </returns>
+        public int Add(Robot robot)
+        {
+            robot.Id = NextId;
             robots.Add(robot);
+            return robot.Id;
         }
 
         /// <summary>
@@ -41,7 +38,7 @@ namespace Model
         /// </summary>
         /// <param name="id"> Идентификатор робота. </param>
         /// <returns> Робот с указанным ID или null, если не найден. </returns>
-        public Robot? GetById(string id) => robots.FirstOrDefault(r => r.Id == id);
+        public Robot? GetById(int id) => robots.FirstOrDefault(r => r.Id == id);
 
         /// <summary>
         /// Возвращает копию списка всех роботов.
@@ -50,25 +47,28 @@ namespace Model
         public List<Robot> GetAll() => robots.ToList();
 
         /// <summary>
-        /// Обновляет существующего робота.
+        /// Изменяет робота с указанным Id.
+        /// Внутри change выполняется ровно одна правка.
         /// </summary>
-        /// <param name="updated"> Робот с новыми данными (ID должен совпадать). </param>
-        /// <exception cref="InvalidOperationException"> Если робот с таким ID не найден. </exception>
-        public void Update(Robot updated)
+        /// <param name="id"> Ключ робота (Id). </param>
+        /// <param name="change"> Делегат, который что-то меняет в найденном роботе. </param>
+        /// <returns> true - если робот найден и правка применена; иначе false. </returns>
+        /// <exception cref="ArgumentNullException"> Если change равен null. </exception>
+        public bool Update(int id, Action<Robot> change)
         {
-            var existing = GetById(updated.Id) 
-                ?? throw new InvalidOperationException($"Робот с ID {updated.Id} не найден");
+            if (change == null)
+            { 
+                throw new ArgumentNullException(nameof(change));           
+            }
 
-            existing.Number = updated.Number;
-            existing.Series = updated.Series;
-            existing.Type = updated.Type;
-            existing.Name = updated.Name;
-            existing.Goal = updated.Goal;
-            existing.Details = updated.Details;
-            existing.Appearance = updated.Appearance;
-            existing.Score = updated.Score;
-            existing.CriteriaCodes = new List<int>(updated.CriteriaCodes);
-            existing.PriceRub = updated.PriceRub;
+            var r = GetById(id);
+            if (r == null) 
+            { 
+                return false;
+            }
+
+            change(r);
+            return true;
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Model
         /// </summary>
         /// <param name="id"> Идентификатор робота. </param>
         /// <returns> true, если робот был удалён; иначе false. </returns>
-        public bool Delete(string id) => robots.RemoveAll(r => r.Id == id) > 0;
+        public bool Delete(int id) => robots.RemoveAll(r => r.Id == id) > 0;
 
         /// <summary>
         /// Бизнес-функция #1: группирует роботов по типу.

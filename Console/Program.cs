@@ -50,15 +50,19 @@ while (true)
         {
             AvgPrice(logic);
         }
-        else
+        else if (choice == "0")
         {
             logic.Save();
             break;
         }
+        else
+        {
+            Console.WriteLine("<W> Неверная команда");
+        }
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Ошибка: {ex.Message}");
+        Console.WriteLine($"<W> Ошибка: {ex.Message}");
     }
 
     Console.WriteLine("\n<W> Нажмите Enter...");
@@ -69,28 +73,34 @@ while (true)
 static void ShowAll(Logic logic)
 {
     var all = logic.GetAll();
-    if (all.Count == 0) 
-    { 
-        Console.WriteLine("<W> Пусто."); 
-        return; 
+    if (all.Count == 0)
+    {
+        Console.WriteLine("<W> Пусто.");
+        return;
     }
-    foreach (var r in all) 
+    foreach (var r in all)
+    {
         Console.WriteLine($"<R> {r}");
+    }
 }
 
 
 static void AddRobot(Logic logic)
 {
     var r = ReadRobot();
-    logic.Add(r);
-    Console.WriteLine("<W> Добавлено.");
+    Console.WriteLine($"<W> Добавлен {logic.Add(r)} робот.");
 }
 
 
 static void FindById(Logic logic)
 {
     Console.Write("<I> ID: ");
-    var id = Console.ReadLine()!;
+    if (!int.TryParse(Console.ReadLine(), out int id))
+    {
+        Console.WriteLine("<E> Некорректный ID.");
+        return;
+    }
+
     var r = logic.GetById(id);
     if (r == null) 
     { 
@@ -106,32 +116,202 @@ static void FindById(Logic logic)
 static void EditRobot(Logic logic)
 {
     Console.Write("<I> ID: ");
-    var id = Console.ReadLine()!;
-    var existing = logic.GetById(id);
-    if (existing == null) 
-    { 
-        Console.WriteLine("<E> Не найдено."); 
-        return; 
+    if (!int.TryParse(Console.ReadLine(), out int id))
+    {
+        Console.WriteLine("<E> Некорректный ID.");
+        return;
     }
 
-    var updated = ReadRobot();
-    updated.Id = id;
-    logic.Update(updated);
-    Console.WriteLine("<W> Обновлено.");
+    var robot = logic.GetById(id);
+    if (robot == null)
+    {
+        Console.WriteLine("<E> Не найдено.");
+        return;
+    }
+
+    while (true)
+    {
+        Console.Clear();
+        Console.WriteLine($"=== РЕДАКТИРОВАНИЕ РОБОТА #{robot.Id} ===");
+        Console.WriteLine($"  Номер:      {robot.Number}");
+        Console.WriteLine($"  Серия:      {robot.Series}");
+        Console.WriteLine($"  Тип:        {robot.Type}");
+        Console.WriteLine($"  Название:   {robot.Name}");
+        Console.WriteLine($"  Цель:       {robot.Goal}");
+        Console.WriteLine($"  Детали:     {robot.Details}");
+        Console.WriteLine($"  Внешность:  {robot.Appearance}");
+        Console.WriteLine($"  Критерии:   {robot.CriteriaCodes.Count}/10 — {CriteriaLegend.Describe(robot.CriteriaCodes)}");
+        Console.WriteLine($"  Цена:       {robot.PriceRub:N0} руб.");
+        Console.WriteLine();
+
+        Console.WriteLine("Что изменить?");
+        Console.WriteLine("  1. Номер");
+        Console.WriteLine("  2. Серия");
+        Console.WriteLine("  3. Тип");
+        Console.WriteLine("  4. Название");
+        Console.WriteLine("  5. Цель");
+        Console.WriteLine("  6. Детали");
+        Console.WriteLine("  7. Внешность");
+        Console.WriteLine("  8. Критерии");
+        Console.WriteLine("  9. Цена");
+        Console.WriteLine("  0. Закончить редактирование");
+        Console.Write("</> ");
+
+        string choice = Console.ReadLine();
+        Console.WriteLine();
+
+        try
+        {
+            if (choice == "1")
+            {
+                Console.Write("<I> Новый номер: ");
+                if (!int.TryParse(Console.ReadLine(), out int number) || number < 0)
+                {
+                    Console.WriteLine("<E> Номер должен быть целым неотрицательным числом.");
+
+                    Console.WriteLine("\n<W> Нажмите Enter...");
+                    Console.ReadLine();
+
+                    continue;
+                }
+                logic.Update(id, r => r.Number = number);
+                Console.WriteLine("<W> Изменено.");
+            }
+            else if (choice == "2")
+            {
+                Console.Write("<I> Новая серия: ");
+                string series = Console.ReadLine() ?? "";
+                logic.Update(id, r => r.Series = series);
+                Console.WriteLine("<W> Изменено.");
+            }
+            else if (choice == "3")
+            {
+                Console.Write("<I> Новый тип: ");
+                string type = Console.ReadLine() ?? "";
+                logic.Update(id, r => r.Type = type);
+                Console.WriteLine("<W> Изменено.");
+            }
+            else if (choice == "4")
+            {
+                Console.Write("<I> Новое название: ");
+                string name = Console.ReadLine() ?? "";
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    Console.WriteLine("<E> Название не может быть пустым.");
+
+                    Console.WriteLine("\n<W> Нажмите Enter...");
+                    Console.ReadLine();
+
+                    continue;
+                }
+                logic.Update(id, r => r.Name = name);
+                Console.WriteLine("<W> Изменено.");
+            }
+            else if (choice == "5")
+            {
+                Console.Write("<I> Новая цель: ");
+                string goal = Console.ReadLine() ?? "";
+                logic.Update(id, r => r.Goal = goal);
+                Console.WriteLine("<W> Изменено.");
+            }
+            else if (choice == "6")
+            {
+                Console.Write("<I> Новые детали: ");
+                string details = Console.ReadLine() ?? "";
+                logic.Update(id, r => r.Details = details);
+                Console.WriteLine("<W> Изменено.");
+            }
+            else if (choice == "7")
+            {
+                Console.Write("<I> Новая внешность: ");
+                string appearance = Console.ReadLine() ?? "";
+                logic.Update(id, r => r.Appearance = appearance);
+                Console.WriteLine("<W> Изменено.");
+            }
+            else if (choice == "8")
+            {
+                Console.WriteLine("<I> Критерии (через запятую, например 1,2,5):");
+                foreach (var kv in CriteriaLegend.Legend)
+                    Console.WriteLine($"  {kv.Key}: {kv.Value}");
+                Console.Write("</> ");
+
+                var codes = Console.ReadLine()!
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => int.Parse(s.Trim()))
+                    .Where(c => c >= 1 && c <= 10)
+                    .Distinct()
+                    .OrderBy(c => c)
+                    .ToList();
+
+                logic.Update(id, r => r.CriteriaCodes = codes);
+                Console.WriteLine("<W> Изменено.");
+            }
+            else if (choice == "9")
+            {
+                Console.Write("<I> Новая цена (руб.): ");
+                if (!decimal.TryParse(Console.ReadLine(), out decimal price) || price < 0)
+                {
+                    Console.WriteLine("<E> Цена должна быть неотрицательным числом.");
+
+                    Console.WriteLine("\n<W> Нажмите Enter...");
+                    Console.ReadLine();
+
+                    continue;
+                }
+                logic.Update(id, r => r.PriceRub = price);
+                Console.WriteLine("<W> Изменено.");
+            }
+            else if (choice == "0")
+            {
+                break;
+            }
+            else
+            {
+                Console.WriteLine("<W> Неверная команда.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"<E> Ошибка: {ex.Message}");
+        }
+
+        Console.WriteLine("\n<W> Нажмите Enter...");
+        Console.ReadLine();
+
+        // обновляем снимок робота — вдруг изменили
+        robot = logic.GetById(id);
+        if (robot == null)
+        {
+            Console.WriteLine("<E> Робот больше не существует.");
+            return;
+        }
+    }
 }
 
 
 static void DeleteRobot(Logic logic)
 {
     Console.Write("<I> ID: ");
-    var id = Console.ReadLine()!;
+    if (!int.TryParse(Console.ReadLine(), out int id))
+    {
+        Console.WriteLine("<E> Некорректный ID.");
+        return;
+    }
+
     Console.WriteLine(logic.Delete(id) ? "<W> Удалено." : "<E> Не найдено.");
 }
 
 
 static void GroupByType(Logic logic)
 {
-    foreach (var g in logic.GroupByType())
+    var groups = logic.GroupByType();
+    if (groups.Count == 0)
+    {
+        Console.WriteLine("<W> Пусто.");
+        return;
+    }
+
+    foreach (var g in groups)
     {
         Console.WriteLine($"[{g.Key}] ({g.Value.Count}):");
         foreach (var r in g.Value) 
@@ -142,16 +322,20 @@ static void GroupByType(Logic logic)
 
 static void AvgPrice(Logic logic)
 {
-    foreach (var kv in logic.AveragePriceBySeries())
-        Console.WriteLine($"{kv.Key}: {kv.Value:N0} ₽");
+    var stats = logic.AveragePriceBySeries();
+    if (stats.Count == 0)
+    {
+        Console.WriteLine("<W> Пусто.");
+        return;
+    }
+
+    foreach (var kv in stats)
+        Console.WriteLine($"{kv.Key}: {kv.Value:N0} руб.");
 }
 
 
 static Robot ReadRobot()
 {
-    Console.Write("<I> ID: "); 
-    string id = Console.ReadLine()!;
-
     Console.Write("<I> Номер: "); 
     int num = int.Parse(Console.ReadLine()!);
 
@@ -186,7 +370,6 @@ static Robot ReadRobot()
 
     return new Robot
     {
-        Id = id,
         Number = num,
         Series = series,
         Type = type,
@@ -195,7 +378,6 @@ static Robot ReadRobot()
         Details = details,
         Appearance = appearance,
         CriteriaCodes = codes,
-        Score = codes.Count,
         PriceRub = price
     };
 }

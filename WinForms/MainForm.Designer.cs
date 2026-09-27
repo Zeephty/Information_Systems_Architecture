@@ -42,13 +42,14 @@
             // listBoxRobots
             // 
             listBoxRobots.BackColor = Color.FromArgb(38, 38, 38);
+            listBoxRobots.Dock = DockStyle.Fill;
             listBoxRobots.Font = new Font("Bahnschrift SemiBold", 10F, FontStyle.Bold);
             listBoxRobots.ForeColor = Color.FromArgb(230, 230, 230);
             listBoxRobots.FormattingEnabled = true;
             listBoxRobots.HorizontalScrollbar = true;
-            listBoxRobots.Location = new Point(23, 24);
+            listBoxRobots.Location = new Point(0, 0);
             listBoxRobots.Name = "listBoxRobots";
-            listBoxRobots.Size = new Size(648, 403);
+            listBoxRobots.Size = new Size(778, 450);
             listBoxRobots.TabIndex = 0;
             // 
             // panelButtons
@@ -59,9 +60,10 @@
             panelButtons.Controls.Add(btnDelete);
             panelButtons.Controls.Add(btnEdit);
             panelButtons.Controls.Add(btnAdd);
-            panelButtons.Location = new Point(677, 24);
+            panelButtons.Dock = DockStyle.Right;
+            panelButtons.Location = new Point(778, 0);
             panelButtons.Name = "panelButtons";
-            panelButtons.Size = new Size(222, 403);
+            panelButtons.Size = new Size(222, 450);
             panelButtons.TabIndex = 1;
             // 
             // btnAvgPrice
@@ -147,10 +149,9 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(30, 30, 30);
-            ClientSize = new Size(911, 450);
-            Controls.Add(panelButtons);
+            ClientSize = new Size(1000, 450);
             Controls.Add(listBoxRobots);
-            FormBorderStyle = FormBorderStyle.FixedSingle;
+            Controls.Add(panelButtons);
             Name = "MainForm";
             Text = "Роботы";
             FormClosing += MainForm_FormClosing;
