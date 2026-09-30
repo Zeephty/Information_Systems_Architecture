@@ -7,10 +7,10 @@ namespace Model
     /// <summary>
     /// Сущность "Робот". Содержит все характеристики робота.
     /// </summary>
-    public class Robot
+    public class Robot : IDomainObject
     {
         /// <summary> Уникальный индентификатор робота (например, RB-001). </summary>
-        public string Id { get; set; } = "";
+        public int Id { get; set; }
 
         /// <summary> Порядковый номер внутри серии. </summary>
         public int Number { get; set; }
@@ -33,9 +33,6 @@ namespace Model
         /// <summary> Описание внешнего вида. </summary>
         public string Appearance { get; set; } = "";
 
-        /// <summary> Итоговая оценка по 10-балльной шкале. </summary>
-        public int Score { get; set; }
-
         /// <summary>Список кодов критериев, по которым начислены баллы. </summary>
         public List<int> CriteriaCodes { get; set; } = new List<int>();
 
@@ -48,7 +45,25 @@ namespace Model
         /// </summary>
         /// <returns> Строка с краткой информацией о роботе. </returns>
         public override string ToString()
-            => $"{Id} | {Series}-{Number} | {Name} | {Type} | {Score}/10 | {PriceRub:N0} ₽";
+            => $"{Id} | {Series}-{Number} | {Name} | {Type} | {CriteriaCodes.Count}/10 | {PriceRub:N0} руб.";
+
+        /// <summary>
+        /// Создаёт независимую копию робота.
+        /// </summary>
+        /// <returns> Возращает копию робота </returns>
+        public Robot Clone() => new Robot
+        {
+            Id = this.Id,
+            Number = this.Number,
+            Series = this.Series,
+            Type = this.Type,
+            Name = this.Name,
+            Goal = this.Goal,
+            Details = this.Details,
+            Appearance = this.Appearance,
+            CriteriaCodes = new List<int>(this.CriteriaCodes),
+            PriceRub = this.PriceRub
+        };
 
     }
 }

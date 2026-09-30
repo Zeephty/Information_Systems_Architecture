@@ -4,7 +4,7 @@
     {
         /// <summary>
         /// Required designer variable.
-        /// </summary>
+        /// </summary> 
         private System.ComponentModel.IContainer components = null;
 
         /// <summary>
@@ -34,11 +34,12 @@
             // richTextBoxDetails
             // 
             richTextBoxDetails.BackColor = Color.FromArgb(30, 30, 30);
+            richTextBoxDetails.Dock = DockStyle.Fill;
             richTextBoxDetails.ForeColor = Color.FromArgb(230, 230, 230);
-            richTextBoxDetails.Location = new Point(12, 12);
+            richTextBoxDetails.Location = new Point(0, 0);
             richTextBoxDetails.Name = "richTextBoxDetails";
             richTextBoxDetails.ReadOnly = true;
-            richTextBoxDetails.Size = new Size(704, 448);
+            richTextBoxDetails.Size = new Size(726, 472);
             richTextBoxDetails.TabIndex = 0;
             richTextBoxDetails.Text = "";
             // 

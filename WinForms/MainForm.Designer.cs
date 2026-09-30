@@ -36,19 +36,24 @@
             btnDelete = new Button();
             btnEdit = new Button();
             btnAdd = new Button();
+            panel1 = new Panel();
+            lblSource = new Label();
+            btnChangeSource = new Button();
             panelButtons.SuspendLayout();
+            panel1.SuspendLayout();
             SuspendLayout();
             // 
             // listBoxRobots
             // 
             listBoxRobots.BackColor = Color.FromArgb(38, 38, 38);
+            listBoxRobots.Dock = DockStyle.Fill;
             listBoxRobots.Font = new Font("Bahnschrift SemiBold", 10F, FontStyle.Bold);
             listBoxRobots.ForeColor = Color.FromArgb(230, 230, 230);
             listBoxRobots.FormattingEnabled = true;
             listBoxRobots.HorizontalScrollbar = true;
-            listBoxRobots.Location = new Point(23, 24);
+            listBoxRobots.Location = new Point(0, 0);
             listBoxRobots.Name = "listBoxRobots";
-            listBoxRobots.Size = new Size(648, 403);
+            listBoxRobots.Size = new Size(778, 399);
             listBoxRobots.TabIndex = 0;
             // 
             // panelButtons
@@ -59,9 +64,10 @@
             panelButtons.Controls.Add(btnDelete);
             panelButtons.Controls.Add(btnEdit);
             panelButtons.Controls.Add(btnAdd);
-            panelButtons.Location = new Point(677, 24);
+            panelButtons.Dock = DockStyle.Right;
+            panelButtons.Location = new Point(778, 0);
             panelButtons.Name = "panelButtons";
-            panelButtons.Size = new Size(222, 403);
+            panelButtons.Size = new Size(222, 399);
             panelButtons.TabIndex = 1;
             // 
             // btnAvgPrice
@@ -142,19 +148,54 @@
             btnAdd.UseVisualStyleBackColor = false;
             btnAdd.Click += btnAdd_Click;
             // 
+            // panel1
+            // 
+            panel1.Controls.Add(btnChangeSource);
+            panel1.Controls.Add(lblSource);
+            panel1.Dock = DockStyle.Bottom;
+            panel1.Location = new Point(0, 399);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(1000, 51);
+            panel1.TabIndex = 2;
+            // 
+            // lblSource
+            // 
+            lblSource.AutoSize = true;
+            lblSource.Font = new Font("Bahnschrift SemiBold", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            lblSource.ForeColor = Color.FromArgb(230, 230, 230);
+            lblSource.Location = new Point(12, 13);
+            lblSource.Name = "lblSource";
+            lblSource.Size = new Size(97, 24);
+            lblSource.TabIndex = 0;
+            lblSource.Text = "Источник";
+            // 
+            // btnChangeSource
+            // 
+            btnChangeSource.BackColor = Color.FromArgb(38, 38, 38);
+            btnChangeSource.Font = new Font("Bahnschrift SemiBold", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            btnChangeSource.ForeColor = Color.FromArgb(230, 230, 230);
+            btnChangeSource.Location = new Point(801, 0);
+            btnChangeSource.Name = "btnChangeSource";
+            btnChangeSource.Size = new Size(177, 41);
+            btnChangeSource.TabIndex = 1;
+            btnChangeSource.Text = "Сменить источник";
+            btnChangeSource.UseVisualStyleBackColor = false;
+            btnChangeSource.Click += btnChangeSource_Click;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(30, 30, 30);
-            ClientSize = new Size(911, 450);
-            Controls.Add(panelButtons);
+            ClientSize = new Size(1000, 450);
             Controls.Add(listBoxRobots);
-            FormBorderStyle = FormBorderStyle.FixedSingle;
+            Controls.Add(panelButtons);
+            Controls.Add(panel1);
             Name = "MainForm";
             Text = "Роботы";
-            FormClosing += MainForm_FormClosing;
             panelButtons.ResumeLayout(false);
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -168,5 +209,8 @@
         private Button btnDelete;
         private Button btnEdit;
         private Button btnAdd;
+        private Panel panel1;
+        private Label lblSource;
+        private Button btnChangeSource;
     }
 }
