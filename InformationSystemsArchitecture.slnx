@@ -1,5 +1,7 @@
 <Solution>
   <Project Path="Console/Console.csproj" Id="1bb54d07-1ef3-424b-b12c-82a1eebf0e9a" />
+  <Project Path="DataAccessLayer/DataAccessLayer.csproj" Id="b82fb10a-b211-405b-9e3e-99d66037209e" />
+  <Project Path="Logic/BLogic.csproj" Id="1e175b81-8373-4b3d-af5a-7cf3b3746a78" />
   <Project Path="Model/Model.csproj" />
   <Project Path="WinForms/WinForms.csproj" Id="eba2a22f-a94e-4751-855b-febae5e64ff6" />
 </Solution>

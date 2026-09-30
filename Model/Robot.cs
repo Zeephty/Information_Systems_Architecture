@@ -7,7 +7,7 @@ namespace Model
     /// <summary>
     /// Сущность "Робот". Содержит все характеристики робота.
     /// </summary>
-    public class Robot
+    public class Robot : IDomainObject
     {
         /// <summary> Уникальный индентификатор робота (например, RB-001). </summary>
         public int Id { get; set; }

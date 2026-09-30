@@ -1,4 +1,6 @@
+using DataAccessLayer;
 using Model;
+using BLogic;
 
 namespace WinForms
 {
@@ -9,7 +11,8 @@ namespace WinForms
     public partial class MainForm : Form
     {
         /// <summary> Экземпляр бизнес-логики приложения. </summary>
-        private readonly Logic logic = new Logic();
+        private readonly Logic logic;
+        private DataSourceKind currentKind = DataSourceKind.Json;
 
         /// <summary>
         /// Инициализирует главное окно, загружает данные из файла и заполняет список роботов.
@@ -17,8 +20,17 @@ namespace WinForms
         public MainForm()
         {
             InitializeComponent();
-            logic.Load();
+
+            var repository = RepositoryFactory.Create(currentKind);
+            logic = new Logic(repository);
+
             RefreshList();
+            UpdateSourceLabel();
+        }
+
+        private void UpdateSourceLabel()
+        {
+            lblSource.Text = $"Источник: {currentKind}";
         }
 
         private void RefreshList()
@@ -32,7 +44,7 @@ namespace WinForms
 
         private Robot? GetSelected()
         {
-            if (listBoxRobots.SelectedIndex < 0) 
+            if (listBoxRobots.SelectedIndex < 0)
             {
                 MessageBox.Show("Выберите робота.", "Внимание");
                 return null;
@@ -71,7 +83,7 @@ namespace WinForms
             if (selected == null)
             {
                 return;
-            } 
+            }
 
             var form = new RobotEditorForm(logic, selected);
             if (form.ShowDialog() == DialogResult.OK)
@@ -83,15 +95,15 @@ namespace WinForms
         private void btnDelete_Click(object sender, EventArgs e)
         {
             var selected = GetSelected();
-            if (selected == null) 
-            { 
-                return; 
+            if (selected == null)
+            {
+                return;
             }
 
             if (MessageBox.Show($"Удалить {selected.Name}?", "Подтверждение",
                     MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                logic.Delete(selected.Id);
+                logic.Delete(selected);
                 RefreshList();
             }
         }
@@ -99,9 +111,9 @@ namespace WinForms
         private void btnDetails_Click(object sender, EventArgs e)
         {
             var selected = GetSelected();
-            if (selected == null) 
-            { 
-                return; 
+            if (selected == null)
+            {
+                return;
             }
             new RobotDetailsForm(selected).ShowDialog();
         }
@@ -137,9 +149,30 @@ namespace WinForms
             new TextDisplayForm("Средняя цена по серии", text).ShowDialog();
         }
 
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void btnChangeSource_Click(object sender, EventArgs e)
         {
-            logic.Save();
+            using var dlg = new DataSourceForm(currentKind);
+            if (dlg.ShowDialog(this) != DialogResult.OK)
+                return;
+
+            try
+            {
+                currentKind = dlg.Selected;
+                logic.SetRepository(RepositoryFactory.Create(currentKind));
+
+                RefreshList();
+                UpdateSourceLabel();
+
+                MessageBox.Show(this,
+                    $"Источник переключён: {currentKind}",
+                    "Готово", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this,
+                    "Не удалось переключить источник:\n" + ex.Message,
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

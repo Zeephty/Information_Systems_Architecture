@@ -1,12 +1,16 @@
 ﻿using Model;
+using DataAccessLayer;
+using BLogic;
 
-Logic logic = new Logic();
-logic.Load();
+DataSourceKind currentKind = DataSourceKind.Json;
+
+IRepository<Robot> repository = RepositoryFactory.Create(currentKind);
+Logic logic = new Logic(repository);
 
 while (true)
 {
     Console.Clear();
-    Console.WriteLine("=== РОБОТЫ ===");
+    Console.WriteLine($"=== РОБОТЫ === ист.-> {currentKind}");
     Console.WriteLine("1. Показать всех");
     Console.WriteLine("2. Добавить");
     Console.WriteLine("3. Найти по ID");
@@ -14,6 +18,7 @@ while (true)
     Console.WriteLine("5. Удалить");
     Console.WriteLine("6. Группировка по типу");
     Console.WriteLine("7. Средняя цена по серии");
+    Console.WriteLine("8. Сменить источник данных");
     Console.WriteLine("0. Выход");
     Console.Write("</> ");
 
@@ -50,9 +55,43 @@ while (true)
         {
             AvgPrice(logic);
         }
+        else if (choice == "8")
+        {
+            Console.WriteLine("Выберите источник:");
+            Console.WriteLine("  1. JSON");
+            Console.WriteLine("  2. Dapper");
+            Console.WriteLine("  3. Entity Framework");
+            Console.Write("</> ");
+
+            var k = Console.ReadLine();
+            var picked = k switch
+            {
+                "1" => DataSourceKind.Json,
+                "2" => DataSourceKind.Dapper,
+                "3" => DataSourceKind.EntityFramework,
+                _ => (DataSourceKind?)null
+            };
+
+            if (picked == null)
+            {
+                Console.WriteLine("<W> Отменено.");
+            }
+            else
+            {
+                try
+                {
+                    currentKind = picked.Value;
+                    logic.SetRepository(RepositoryFactory.Create(currentKind));
+                    Console.WriteLine($"<W> Источник переключён: {currentKind}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"<E> Не удалось переключить: {ex.Message}");
+                }
+            }
+        }
         else if (choice == "0")
         {
-            logic.Save();
             break;
         }
         else
@@ -88,7 +127,8 @@ static void ShowAll(Logic logic)
 static void AddRobot(Logic logic)
 {
     var r = ReadRobot();
-    Console.WriteLine($"<W> Добавлен {logic.Add(r)} робот.");
+    logic.Add(r);
+    Console.WriteLine($"<W> Добавлен {r.Name} робот.");
 }
 
 
@@ -174,21 +214,25 @@ static void EditRobot(Logic logic)
 
                     continue;
                 }
-                logic.Update(id, r => r.Number = number);
+
+                robot.Number = number;
+                logic.Update(robot);
                 Console.WriteLine("<W> Изменено.");
             }
             else if (choice == "2")
             {
                 Console.Write("<I> Новая серия: ");
                 string series = Console.ReadLine() ?? "";
-                logic.Update(id, r => r.Series = series);
+                robot.Series = series;
+                logic.Update(robot);
                 Console.WriteLine("<W> Изменено.");
             }
             else if (choice == "3")
             {
                 Console.Write("<I> Новый тип: ");
                 string type = Console.ReadLine() ?? "";
-                logic.Update(id, r => r.Type = type);
+                robot.Type = type;
+                logic.Update(robot);
                 Console.WriteLine("<W> Изменено.");
             }
             else if (choice == "4")
@@ -204,28 +248,32 @@ static void EditRobot(Logic logic)
 
                     continue;
                 }
-                logic.Update(id, r => r.Name = name);
+                robot.Name = name;
+                logic.Update(robot);
                 Console.WriteLine("<W> Изменено.");
             }
             else if (choice == "5")
             {
                 Console.Write("<I> Новая цель: ");
                 string goal = Console.ReadLine() ?? "";
-                logic.Update(id, r => r.Goal = goal);
+                robot.Goal = goal;
+                logic.Update(robot);
                 Console.WriteLine("<W> Изменено.");
             }
             else if (choice == "6")
             {
                 Console.Write("<I> Новые детали: ");
                 string details = Console.ReadLine() ?? "";
-                logic.Update(id, r => r.Details = details);
+                robot.Details = details;
+                logic.Update(robot);
                 Console.WriteLine("<W> Изменено.");
             }
             else if (choice == "7")
             {
                 Console.Write("<I> Новая внешность: ");
                 string appearance = Console.ReadLine() ?? "";
-                logic.Update(id, r => r.Appearance = appearance);
+                robot.Appearance = appearance;
+                logic.Update(robot);
                 Console.WriteLine("<W> Изменено.");
             }
             else if (choice == "8")
@@ -243,7 +291,8 @@ static void EditRobot(Logic logic)
                     .OrderBy(c => c)
                     .ToList();
 
-                logic.Update(id, r => r.CriteriaCodes = codes);
+                robot.CriteriaCodes = codes;
+                logic.Update(robot);
                 Console.WriteLine("<W> Изменено.");
             }
             else if (choice == "9")
@@ -258,7 +307,8 @@ static void EditRobot(Logic logic)
 
                     continue;
                 }
-                logic.Update(id, r => r.PriceRub = price);
+                robot.PriceRub = price;
+                logic.Update(robot);
                 Console.WriteLine("<W> Изменено.");
             }
             else if (choice == "0")
@@ -298,7 +348,15 @@ static void DeleteRobot(Logic logic)
         return;
     }
 
-    Console.WriteLine(logic.Delete(id) ? "<W> Удалено." : "<E> Не найдено.");
+    var r = logic.GetById(id);
+    if (r == null)
+    {
+        Console.WriteLine("<E> Не найдено.");
+        return;
+    }
+
+    logic.Delete(r);
+    Console.WriteLine("<W> Удалено.");
 }
 
 

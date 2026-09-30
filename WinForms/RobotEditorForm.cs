@@ -6,6 +6,7 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using BLogic;
 
 namespace WinForms
 {
@@ -148,25 +149,8 @@ namespace WinForms
                 return;
             }
 
-            bool ok = logic.Update(robotId, r =>
-            {
-                r.Number = draft.Number;
-                r.Series = draft.Series;
-                r.Type = draft.Type;
-                r.Name = draft.Name;
-                r.Goal = draft.Goal;
-                r.Details = draft.Details;
-                r.Appearance = draft.Appearance;
-                r.CriteriaCodes = new List<int>(draft.CriteriaCodes);
-                r.PriceRub = draft.PriceRub;
-            });
-
-            if (!ok)
-            {
-                MessageBox.Show(this, "Робот не найден в хранилище.",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            draft.Id = robotId;
+            logic.Update(draft);
 
             DialogResult = DialogResult.OK;
         }
