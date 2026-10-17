@@ -21,7 +21,7 @@ namespace BLogic
         /// <summary>
         /// Инициализирует новый экземпляр модуля конфигурации Ninject.
         /// </summary>
-        /// <param name="defaultKind"> Источник данных (JSON, Dapper, EF), выбираемый по умолчанию </param>
+        /// <param name="defaultKind"> Источник данных, выбираемый по умолчанию </param>
         public ConfigModule(DataSourceKind defaultKind)
         {
             this.defaultKind = defaultKind;
