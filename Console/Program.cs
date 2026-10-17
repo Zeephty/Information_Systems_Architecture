@@ -1,11 +1,13 @@
 ﻿using Model;
 using DataAccessLayer;
 using BLogic;
+using Ninject;
 
 DataSourceKind currentKind = DataSourceKind.Json;
 
-IRepository<Robot> repository = RepositoryFactory.Create(currentKind);
-Logic logic = new Logic(repository);
+IKernel kernel = new StandardKernel(new ConfigModule(currentKind));
+
+Logic logic = kernel.Get<Logic>();
 
 while (true)
 {
