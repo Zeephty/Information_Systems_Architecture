@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using BLogic;
+using BLogic.Interfaces;
 
 namespace WinForms
 {
@@ -15,7 +16,7 @@ namespace WinForms
     /// </summary>
     public partial class RobotEditorForm : Form
     {
-        private readonly Logic logic;
+        private readonly ILogic logic;
         private readonly int robotId;
         private Robot draft;
 
@@ -27,7 +28,7 @@ namespace WinForms
         /// <param name="logic"> Логика </param>
         /// <param name="source"> Выбранный робот </param>
         /// <exception cref="ArgumentNullException"></exception>
-        public RobotEditorForm(Logic logic, Robot source)
+        public RobotEditorForm(ILogic logic, Robot source)
         {
             InitializeComponent();
 

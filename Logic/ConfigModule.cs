@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using BLogic.Interfaces;
+using BLogic.Realization;
 using DataAccessLayer;
 using Model;
 using Ninject.Modules;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace BLogic
 {
@@ -35,7 +37,13 @@ namespace BLogic
         {
             Bind<IRepository<Robot>>().ToMethod(context => RepositoryFactory.Create(this.defaultKind)).InSingletonScope();
 
-            Bind<Logic>().ToSelf().InSingletonScope();
+            Bind<RepositoryProvider>().ToSelf().InSingletonScope();
+
+            Bind<IOperationsCRUD>().To<OperationsCRUD>().InSingletonScope();
+            Bind<IGroupByTypeFunction>().To<CGroupByTypeFunction>().InSingletonScope();
+            Bind<IAveragePriceFunction>().To<CAveragePriceFunction>().InSingletonScope();
+
+            Bind<ILogic>().To<Logic2>().InSingletonScope();
         }
     }
 }
