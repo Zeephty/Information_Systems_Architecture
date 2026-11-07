@@ -1,12 +1,14 @@
-﻿using DataAccessLayer;
+﻿using BLogic.Interfaces;
+using DataAccessLayer;
 using Model;
+using System.Security.Principal;
 
 namespace BLogic
 {
     /// <summary>
     /// Бизнес-логика приложения. Содержит CRUD-операции и бизнес-функции.
     /// </summary>
-    public class Logic
+    public class Logic : ILogic
     {
         private IRepository<Robot> repository;
 

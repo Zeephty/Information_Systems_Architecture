@@ -44,7 +44,6 @@ namespace DataAccessLayer
         /// <summary>
         /// Создаёт репозиторий указанного типа для доменного объекта Robot.
         /// </summary>
-        /// <typeparam name="T"> Доменный объект </typeparam>
         /// <param name="kind"> Какой источник использовать. </param>
         /// <returns> Экземпляр IRepository, готовый к CRUD-операциям над Robot. </returns>
         /// <exception cref="ArgumentOutOfRangeException"> 

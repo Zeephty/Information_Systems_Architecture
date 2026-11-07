@@ -1,11 +1,14 @@
 ﻿using Model;
 using DataAccessLayer;
 using BLogic;
+using Ninject;
+using BLogic.Interfaces;
 
 DataSourceKind currentKind = DataSourceKind.Json;
 
-IRepository<Robot> repository = RepositoryFactory.Create(currentKind);
-Logic logic = new Logic(repository);
+IKernel kernel = new StandardKernel(new ConfigModule(currentKind));
+
+ILogic logic = kernel.Get<ILogic>();
 
 while (true)
 {
@@ -109,7 +112,7 @@ while (true)
 }
 
 
-static void ShowAll(Logic logic)
+static void ShowAll(ILogic logic)
 {
     var all = logic.GetAll();
     if (all.Count == 0)
@@ -124,7 +127,7 @@ static void ShowAll(Logic logic)
 }
 
 
-static void AddRobot(Logic logic)
+static void AddRobot(ILogic logic)
 {
     var r = ReadRobot();
     logic.Add(r);
@@ -132,7 +135,7 @@ static void AddRobot(Logic logic)
 }
 
 
-static void FindById(Logic logic)
+static void FindById(ILogic logic)
 {
     Console.Write("<I> ID: ");
     if (!int.TryParse(Console.ReadLine(), out int id))
@@ -153,7 +156,7 @@ static void FindById(Logic logic)
 }
 
 
-static void EditRobot(Logic logic)
+static void EditRobot(ILogic logic)
 {
     Console.Write("<I> ID: ");
     if (!int.TryParse(Console.ReadLine(), out int id))
@@ -339,7 +342,7 @@ static void EditRobot(Logic logic)
 }
 
 
-static void DeleteRobot(Logic logic)
+static void DeleteRobot(ILogic logic)
 {
     Console.Write("<I> ID: ");
     if (!int.TryParse(Console.ReadLine(), out int id))
@@ -360,7 +363,7 @@ static void DeleteRobot(Logic logic)
 }
 
 
-static void GroupByType(Logic logic)
+static void GroupByType(ILogic logic)
 {
     var groups = logic.GroupByType();
     if (groups.Count == 0)
@@ -378,7 +381,7 @@ static void GroupByType(Logic logic)
 }
 
 
-static void AvgPrice(Logic logic)
+static void AvgPrice(ILogic logic)
 {
     var stats = logic.AveragePriceBySeries();
     if (stats.Count == 0)

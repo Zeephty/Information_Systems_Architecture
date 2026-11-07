@@ -7,13 +7,13 @@ namespace DataAccessLayer
 {
     /// <summary>
     /// Репозиторий — инкапсулирует доступ к источнику данных для доменного объекта T.
-    /// Конкретные реализации (JSON, Dapper, EF) живут в проекте DataAccessLayer.
+    /// Предоставляет унифицированный интерфейс для выполнения CRUD-операций
     /// </summary>
     /// <typeparam name="T"> Тип доменного объекта. </typeparam>
     public interface IRepository<T> where T : IDomainObject, new()
     {
         /// <summary>
-        /// Создать новую запись. Поле Id заполняется хранилищем.
+        /// Создать новую запись.
         /// </summary>
         /// <param name="obj"> Доменный объект для добавления. </param>
         void Create(T obj);

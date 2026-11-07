@@ -1,6 +1,8 @@
 using DataAccessLayer;
 using Model;
 using BLogic;
+using Ninject;
+using BLogic.Interfaces;
 
 namespace WinForms
 {
@@ -11,7 +13,8 @@ namespace WinForms
     public partial class MainForm : Form
     {
         /// <summary> Экземпляр бизнес-логики приложения. </summary>
-        private readonly Logic logic;
+        private readonly ILogic logic;
+        private readonly IKernel kernel;
         private DataSourceKind currentKind = DataSourceKind.Json;
 
         /// <summary>
@@ -20,9 +23,9 @@ namespace WinForms
         public MainForm()
         {
             InitializeComponent();
-
-            var repository = RepositoryFactory.Create(currentKind);
-            logic = new Logic(repository);
+            
+            kernel = new StandardKernel(new ConfigModule(currentKind));
+            logic = kernel.Get<ILogic>();
 
             RefreshList();
             UpdateSourceLabel();
