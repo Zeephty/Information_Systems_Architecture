@@ -1,20 +1,54 @@
-using DataAccessLayer;
-using Model;
-using BLogic;
-using Ninject;
-using BLogic.Interfaces;
+using Shared;
 
 namespace WinForms
 {
     /// <summary>
-    /// Главное окно приложения. Отображает список роботов,
-    /// предоставляет кнопки CRUD-операций и бизнес-функций.
+    /// Реализация представления WinForms (View)
     /// </summary>
-    public partial class MainForm : Form
+    public partial class MainForm : Form, IView
     {
-        /// <summary> Экземпляр бизнес-логики приложения. </summary>
-        private readonly ILogic logic;
-        private readonly IKernel kernel;
+        /// <summary>
+        /// Добавить робота
+        /// </summary>
+        public event Action<RobotDTO>? AddRobotRequested;
+
+        /// <summary>
+        /// Редактировать робота
+        /// </summary>
+        public event Action<RobotDTO>? UpdateRobotRequested;
+
+        /// <summary>
+        /// Удалить робота
+        /// </summary>
+        public event Action<int>? DeleteRobotRequested;
+
+        /// <summary>
+        /// Найти робота
+        /// </summary>
+        public event Action<int>? FindRobotRequested;
+
+        /// <summary>
+        /// Обновить
+        /// </summary>
+        public event Action? RefreshRequested;
+
+        /// <summary>
+        /// Изменить источник
+        /// </summary>
+        public event Action<DataSourceKind>? ChangeSourceRequested;
+
+        /// <summary>
+        /// Сгруппировать
+        /// </summary>
+        public event Action? GroupByTypeRequested;
+
+        /// <summary>
+        /// Вычислить ср. значения
+        /// </summary>
+        public event Action? AveragePriceRequested;
+
+        private List<RobotDTO> currentRobots = new List<RobotDTO>();
+
         private DataSourceKind currentKind = DataSourceKind.Json;
 
         /// <summary>
@@ -23,36 +57,105 @@ namespace WinForms
         public MainForm()
         {
             InitializeComponent();
-            
-            kernel = new StandardKernel(new ConfigModule(currentKind));
-            logic = kernel.Get<ILogic>();
 
-            RefreshList();
-            UpdateSourceLabel();
-        }
-
-        private void UpdateSourceLabel()
-        {
             lblSource.Text = $"Источник: {currentKind}";
         }
 
-        private void RefreshList()
+        /// <summary>
+        /// Показать роботов
+        /// </summary>
+        /// <param name="robots"> DTO робота </param>
+        public void ShowRobots(IEnumerable<RobotDTO> robots)
         {
+            currentRobots = robots.ToList();
+
             listBoxRobots.Items.Clear();
-            foreach (var r in logic.GetAll())
+            foreach (var r in currentRobots)
             {
-                listBoxRobots.Items.Add(r.ToString());
+                listBoxRobots.Items.Add($"{r.Id} | {r.Series}-{r.Number} | {r.Name} | {r.Type} | {r.CriteriaCodes.Count}/10 | {r.PriceRub:N0} руб.");
             }
         }
 
-        private Robot? GetSelected()
+        /// <summary>
+        /// Показать ошибку
+        /// </summary>
+        /// <param name="message"> Сообщение о ошибке </param>
+        public void ShowError(string message)
+        {
+            MessageBox.Show(message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        /// <summary>
+        /// Показать сообщение
+        /// </summary>
+        /// <param name="message"> Показ сообщения </param>
+        public void ShowMessage(string message)
+        {
+            MessageBox.Show(message, "Инфо", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        /// <summary>
+        /// Отобразить обновленный источник
+        /// </summary>
+        /// <param name="sourceName"> Новый источник </param>
+        public void UpdateSourceLabel(string sourceName)
+        {
+            lblSource.Text = $"Источник: {sourceName}";
+
+            if (Enum.TryParse<DataSourceKind>(sourceName, out var kind))
+            {
+                currentKind = kind;
+            }
+        }
+
+        /// <summary>
+        /// Подробнее посмореть сущность
+        /// </summary>
+        /// <param name="robot"> DTO робота </param>
+        public void ShowDetails(RobotDTO robot)
+        {
+            new RobotDetailsForm(robot).ShowDialog();
+        }
+
+        /// <summary>
+        /// Отрисовка группировки
+        /// </summary>
+        /// <param name="groups"> Словарь из сгруппированных элементов </param>
+        public void ShowGrouping(Dictionary<string, List<RobotDTO>> groups)
+        {
+            if (groups.Count == 0)
+            {
+                MessageBox.Show("Список пуст.", "Группировка по типу");
+                return;
+            }
+
+            var text = string.Join("\n\n", groups.Select(g => $"[{g.Key}] ({g.Value.Count}):\n" + string.Join("\n", g.Value.Select(r => "  " + r.Name))));
+            new TextDisplayForm("Группировка по типу", text).ShowDialog();
+        }
+
+        /// <summary>
+        /// Отрисовка ср. арифм
+        /// </summary>
+        /// <param name="stats"> Словарь ср. арифм </param>
+        public void ShowAveragePrice(Dictionary<string, decimal> stats)
+        {
+            if (stats.Count == 0)
+            {
+                MessageBox.Show("Список пуст.", "Средняя цена по серии");
+                return;
+            }
+
+            var text = string.Join("\n", stats.Select(kv => $"{kv.Key}: {kv.Value:N0} ₽"));
+            new TextDisplayForm("Средняя цена", text).ShowDialog();
+        }
+
+        private RobotDTO? GetSelectedDTO()
         {
             if (listBoxRobots.SelectedIndex < 0)
             {
                 MessageBox.Show("Выберите робота.", "Внимание");
                 return null;
             }
-
             var text = listBoxRobots.SelectedItem?.ToString();
             if (string.IsNullOrEmpty(text))
             {
@@ -60,7 +163,7 @@ namespace WinForms
             }
 
             string idStr = text.Split('|')[0].Trim();
-            return int.TryParse(idStr, out int id) ? logic.GetById(id) : null;
+            return int.TryParse(idStr, out int id) ? currentRobots.FirstOrDefault(r => r.Id == id) : null;
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -68,36 +171,28 @@ namespace WinForms
             var form = new RobotEditForm(null);
             if (form.ShowDialog() == DialogResult.OK)
             {
-                try
-                {
-                    logic.Add(form.Result);
-                    RefreshList();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
+                AddRobotRequested?.Invoke(form.Result);
             }
         }
 
         private void btnEdit_Click(object sender, EventArgs e)
         {
-            var selected = GetSelected();
+            var selected = GetSelectedDTO();
             if (selected == null)
             {
                 return;
             }
 
-            var form = new RobotEditorForm(logic, selected);
+            var form = new RobotEditorForm(selected);
             if (form.ShowDialog() == DialogResult.OK)
             {
-                RefreshList();
+                UpdateRobotRequested?.Invoke(form.Result);
             }
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            var selected = GetSelected();
+            var selected = GetSelectedDTO();
             if (selected == null)
             {
                 return;
@@ -106,75 +201,35 @@ namespace WinForms
             if (MessageBox.Show($"Удалить {selected.Name}?", "Подтверждение",
                     MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                logic.Delete(selected);
-                RefreshList();
+                DeleteRobotRequested?.Invoke(selected.Id);
             }
         }
 
         private void btnDetails_Click(object sender, EventArgs e)
         {
-            var selected = GetSelected();
-            if (selected == null)
+            var selected = GetSelectedDTO();
+            if (selected != null)
             {
-                return;
+                FindRobotRequested?.Invoke(selected.Id);
             }
-            new RobotDetailsForm(selected).ShowDialog();
         }
 
         private void btnGroupByType_Click(object sender, EventArgs e)
         {
-            var groups = logic.GroupByType();
-
-            if (groups.Count == 0)
-            {
-                MessageBox.Show("Список пуст.", "Группировка по типу");
-                return;
-            }
-
-            var text = string.Join("\n\n", groups.Select(g => $"[{g.Key}] ({g.Value.Count}):\n" +
-                string.Join("\n", g.Value.Select(r => "  " + r.Name))));
-
-            new TextDisplayForm("Группировка по типу", text).ShowDialog();
+            GroupByTypeRequested?.Invoke();
         }
 
         private void btnAvgPrice_Click(object sender, EventArgs e)
         {
-            var stats = logic.AveragePriceBySeries();
-
-            if (stats.Count == 0)
-            {
-                MessageBox.Show("Список пуст.", "Средняя цена по серии");
-                return;
-            }
-
-            var text = string.Join("\n", stats.Select(kv => $"{kv.Key}: {kv.Value:N0} ₽"));
-
-            new TextDisplayForm("Средняя цена по серии", text).ShowDialog();
+            AveragePriceRequested?.Invoke();
         }
 
         private void btnChangeSource_Click(object sender, EventArgs e)
         {
             using var dlg = new DataSourceForm(currentKind);
-            if (dlg.ShowDialog(this) != DialogResult.OK)
-                return;
-
-            try
+            if (dlg.ShowDialog(this) == DialogResult.OK)
             {
-                currentKind = dlg.Selected;
-                logic.SetRepository(RepositoryFactory.Create(currentKind));
-
-                RefreshList();
-                UpdateSourceLabel();
-
-                MessageBox.Show(this,
-                    $"Источник переключён: {currentKind}",
-                    "Готово", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(this,
-                    "Не удалось переключить источник:\n" + ex.Message,
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ChangeSourceRequested?.Invoke(dlg.Selected);
             }
         }
     }

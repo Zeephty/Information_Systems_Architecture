@@ -1,4 +1,4 @@
-﻿using Model;
+﻿using Shared;
 
 namespace WinForms
 {
@@ -12,7 +12,7 @@ namespace WinForms
         /// Создаёт окно c описанием для указанного робота.
         /// </summary>
         /// <param name="robot"> Робот, чьи данные нужно отобразить. </param>
-        public RobotDetailsForm(Robot robot)
+        public RobotDetailsForm(RobotDTO robot)
         {
             InitializeComponent();
 
