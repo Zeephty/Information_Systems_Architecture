@@ -1,4 +1,4 @@
-﻿using Model;
+﻿using Shared;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,8 +6,6 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using BLogic;
-using BLogic.Interfaces;
 
 namespace WinForms
 {
@@ -16,25 +14,38 @@ namespace WinForms
     /// </summary>
     public partial class RobotEditorForm : Form
     {
-        private readonly ILogic logic;
         private readonly int robotId;
-        private Robot draft;
+        private RobotDTO draft;
 
         private bool suppressCriteriaCheck;
 
         /// <summary>
+        /// Результат редактирования. Заполняется при нажатии кнопки «OK».
+        /// </summary>
+        public RobotDTO Result { get; private set; } = new RobotDTO();
+
+        /// <summary>
         /// Окно редактирования робота
         /// </summary>
-        /// <param name="logic"> Логика </param>
         /// <param name="source"> Выбранный робот </param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public RobotEditorForm(ILogic logic, Robot source)
+        public RobotEditorForm(RobotDTO source)
         {
             InitializeComponent();
 
-            this.logic = logic ?? throw new ArgumentNullException(nameof(logic));
             this.robotId = source.Id;
-            this.draft = source.Clone();
+            this.draft = new RobotDTO
+            {
+                Id = source.Id,
+                Number = source.Number,
+                Series = source.Series,
+                Type = source.Type,
+                Name = source.Name,
+                Goal = source.Goal,
+                Details = source.Details,
+                Appearance = source.Appearance,
+                CriteriaCodes = new List<int>(source.CriteriaCodes),
+                PriceRub = source.PriceRub
+            };
 
             Text = $"Редактирование робота #{source.Id} — {source.Name}";
             rtxtIdValue.Text = source.Id.ToString();
@@ -70,7 +81,7 @@ namespace WinForms
             rtxtPriceValue.Text = $"{draft.PriceRub:N0} руб.";
         }
 
-        private void EditText(string title, Func<Robot, string> getter, Action<Robot, string> setter)
+        private void EditText(string title, Func<RobotDTO, string> getter, Action<RobotDTO, string> setter)
         {
             var dlg = new PropertyEditDialog(title, getter(draft));
             if (dlg.ShowDialog(this) != DialogResult.OK) return;
@@ -151,7 +162,8 @@ namespace WinForms
             }
 
             draft.Id = robotId;
-            logic.Update(draft);
+
+            Result = draft;
 
             DialogResult = DialogResult.OK;
         }

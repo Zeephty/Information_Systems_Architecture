@@ -3,6 +3,7 @@ using BLogic.Realization;
 using DataAccessLayer;
 using Model;
 using Ninject.Modules;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -44,6 +45,8 @@ namespace BLogic
             Bind<IAveragePriceFunction>().To<CAveragePriceFunction>().InSingletonScope();
 
             Bind<ILogic>().To<Logic2>().InSingletonScope();
+
+            Bind<IObservableLogic>().To<ObservableLogicDecorator>().InSingletonScope();
         }
     }
 }

@@ -1,7 +1,9 @@
 <Solution>
-  <Project Path="Console/Console.csproj" Id="1bb54d07-1ef3-424b-b12c-82a1eebf0e9a" />
+  <Project Path="Console/ConsoleApp.csproj" Id="1bb54d07-1ef3-424b-b12c-82a1eebf0e9a" />
   <Project Path="DataAccessLayer/DataAccessLayer.csproj" Id="b82fb10a-b211-405b-9e3e-99d66037209e" />
   <Project Path="Logic/BLogic.csproj" Id="1e175b81-8373-4b3d-af5a-7cf3b3746a78" />
   <Project Path="Model/Model.csproj" />
+  <Project Path="Presenter/Presenter.csproj" Id="27cb1613-dce8-435e-a560-b7369a989eee" />
+  <Project Path="Shared/Shared.csproj" Id="1165dcc2-1cd0-49c6-a069-a306221c0f85" />
   <Project Path="WinForms/WinForms.csproj" Id="eba2a22f-a94e-4751-855b-febae5e64ff6" />
 </Solution>

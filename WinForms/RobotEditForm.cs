@@ -1,4 +1,4 @@
-﻿using Model;
+﻿using Shared;
 
 namespace WinForms
 {
@@ -10,13 +10,13 @@ namespace WinForms
         /// <summary>
         /// Результат редактирования. Заполняется при нажатии кнопки «OK».
         /// </summary>
-        public Robot Result { get; private set; } = new Robot();
+        public RobotDTO Result { get; private set; } = new RobotDTO();
 
         /// <summary>
         /// Создаёт окно редактирования.
         /// </summary>
         /// <param name="existing">Существующий робот для редактирования или null для создания нового.</param>
-        public RobotEditForm(Robot? existing)
+        public RobotEditForm(RobotDTO? existing)
         {
             InitializeComponent();
 
@@ -53,7 +53,7 @@ namespace WinForms
                     codes.Add(i + 1);
             }
 
-            Result = new Robot
+            Result = new RobotDTO
             {
                 Id = 0,
                 Number = number,

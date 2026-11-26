@@ -1,20 +1,11 @@
 ﻿using Model;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace DataAccessLayer
 {
-    /// <summary>
-    /// Тип источника данных, между которыми можно переключаться во время работы.
-    /// </summary>
-    public enum DataSourceKind
-    {
-        Json,
-        Dapper,
-        EntityFramework
-    }
-
     /// <summary>
     /// Единственная публичная точка входа в DAL.
     /// Знает: строку подключения к БД, путь к JSON-файлу,
